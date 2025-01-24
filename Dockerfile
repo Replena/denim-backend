@@ -10,4 +10,4 @@ COPY . .
 
 EXPOSE 8081
 
-CMD npm run db:init && npm start 
+CMD ["npm", "start"] 
