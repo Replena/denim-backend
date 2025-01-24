@@ -14,6 +14,7 @@ app.use(
       "https://denim-frontend.vercel.app",
       "https://denim-frontend-git-main-replenas-projects.vercel.app",
       "https://denim-frontend-33lo11gc9-replenas-projects.vercel.app",
+      "https://denim-frontend-lhuivrq5t-replenas-projects.vercel.app",
       "https://denim-frontend-*.vercel.app",
       "https://denim-frontend-*-replenas-projects.vercel.app",
       "http://localhost:5173",
