@@ -29,6 +29,12 @@ app.options("*", cors());
 // JSON parse
 app.use(express.json());
 
+// Loglama middleware'i
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
 // Ana route
 app.get("/", (req, res) => {
   res.json({ message: "API çalışıyor" });
@@ -41,13 +47,17 @@ app.use("/api/prices", priceRoutes);
 const PORT = process.env.PORT || 8081;
 
 // Veritabanı bağlantısı ve sunucuyu başlat
+console.log("Uygulama başlatılıyor...");
+
 db.authenticate()
   .then(() => {
     console.log("Veritabanı bağlantısı başarılı");
 
     // HTTP sunucusunu başlat
-    const server = app.listen(PORT, () => {
+    const server = app.listen(PORT, "0.0.0.0", () => {
       console.log(`Sunucu ${PORT} portunda çalışıyor`);
+      console.log("Environment:", process.env.NODE_ENV);
+      console.log("CORS origins:", app.get("cors").origin);
     });
 
     // Graceful shutdown
@@ -75,11 +85,12 @@ db.authenticate()
 
 // Global hata yakalama
 app.use((err, req, res, next) => {
-  console.error("Sunucu hatası:", err);
+  console.error(`[${new Date().toISOString()}] Hata:`, err);
   res.status(500).json({
     success: false,
     message: "Sunucuda bir hata oluştu",
     error: err.message,
+    stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
   });
 });
 
