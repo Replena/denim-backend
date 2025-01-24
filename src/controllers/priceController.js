@@ -17,61 +17,80 @@ const calculatePriceDetails = (baseCost, overhead, commission, profit, vat) => {
 };
 
 exports.calculatePrice = async (req, res) => {
-  const {
-    customer_id,
-    fabric_price,
-    lining_price,
-    garni_price,
-    labor_cost = 0,
-    overhead,
-    commission,
-    profit_margin = 20,
-    vat = 18,
-    currency = "TRY",
-    exchangeRates,
-  } = req.body;
+  try {
+    const {
+      customer_id,
+      fabric_price,
+      lining_price,
+      garni_price,
+      labor_cost = 0,
+      overhead,
+      commission,
+      profit_margin = 20,
+      vat = 18,
+      currency = "TRY",
+      exchangeRates,
+    } = req.body;
 
-  // Temel maliyet hesaplama
-  const baseCost = [fabric_price, lining_price, garni_price, labor_cost].reduce(
-    (sum, price) => sum + Number(price),
-    0
-  );
+    // Gelen değerlerin kontrolü
+    if (!customer_id || !fabric_price || !overhead || !commission) {
+      return res.status(400).json({
+        message: "Gerekli alanlar eksik",
+      });
+    }
 
-  // Fiyat detaylarını hesapla
-  const priceDetails = calculatePriceDetails(
-    baseCost,
-    Number(overhead),
-    Number(commission),
-    Number(profit_margin),
-    Number(vat)
-  );
+    // Temel maliyet hesaplama
+    const baseCost = [fabric_price, lining_price, garni_price, labor_cost].reduce(
+      (sum, price) => sum + Number(price),
+      0
+    );
 
-  // Döviz hesaplamaları
-  const finalPriceEUR = priceDetails.finalPrice / exchangeRates.EUR_TRY;
-  const finalPriceUSD = priceDetails.finalPrice / exchangeRates.USD_TRY;
+    // Fiyat detaylarını hesapla
+    const priceDetails = calculatePriceDetails(
+      baseCost,
+      Number(overhead),
+      Number(commission),
+      Number(profit_margin),
+      Number(vat)
+    );
 
-  // Veritabanına kaydet
-  const price = await Price.create({
-    customer_id,
-    fabric_price,
-    lining_price,
-    garni_price,
-    labor_cost,
-    overhead,
-    commission,
-    profit_margin,
-    vat,
-    final_price_tl: priceDetails.finalPrice,
-    currency,
-  });
+    // Döviz hesaplamaları
+    const finalPriceEUR = priceDetails.finalPrice / exchangeRates.EUR_TRY;
+    const finalPriceUSD = priceDetails.finalPrice / exchangeRates.USD_TRY;
 
-  res.status(201).json({
-    ...price.toJSON(),
-    baseCost,
-    ...priceDetails,
-    finalPriceEUR,
-    finalPriceUSD,
-  });
+    // Veritabanına kaydet
+    const price = await Price.create({
+      customer_id,
+      fabric_price,
+      lining_price,
+      garni_price,
+      labor_cost,
+      overhead,
+      commission,
+      profit_margin,
+      vat,
+      final_price_tl: priceDetails.finalPrice,
+      currency,
+    });
+
+    res.status(201).json({
+      success: true,
+      data: {
+        ...price.toJSON(),
+        baseCost,
+        ...priceDetails,
+        finalPriceEUR,
+        finalPriceUSD,
+      }
+    });
+  } catch (error) {
+    console.error("Fiyat hesaplama hatası:", error);
+    res.status(500).json({
+      success: false,
+      message: "Fiyat hesaplanırken bir hata oluştu",
+      error: error.message
+    });
+  }
 };
 
 exports.getPriceHistory = async (req, res) => {

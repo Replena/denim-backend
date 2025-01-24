@@ -4,11 +4,11 @@ require("dotenv").config();
 // Railway PostgreSQL bağlantı bilgileri
 const sequelize = new Sequelize({
   dialect: "postgres",
-  host: "autorack.proxy.rlwy.net",
-  port: 45517,
-  database: "railway",
-  username: "postgres",
-  password: "ewfnVUuASohkxfVDuTcqcsYGXiMMBNDz",
+  host: "dpg-cu9mpntsvqrc73dhnbng-a",
+  port: 5432,
+  database: "denim",
+  username: "denim_user",
+  password: "EOLmGnnWzp9kUNg0rssOOEY0U11xEAvb",
   dialectOptions: {
     ssl: {
       require: true,
