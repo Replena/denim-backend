@@ -36,7 +36,7 @@ exports.calculatePrice = async (req, res) => {
       fabric_price: parseFloat(fabric_price),
       lining_price: parseFloat(lining_price),
       garni_price: parseFloat(garni_price),
-      labor_cost: parseFloat(labor_cost),
+      labor_cost: parseFloat(labor_cost || 0), // labor_cost 0 ise varsayılan değer
       overhead: parseFloat(overhead),
       commission: parseFloat(commission),
       profit_margin: parseFloat(profit_margin),
@@ -66,6 +66,7 @@ exports.calculatePrice = async (req, res) => {
         ...numericValues,
         final_price_tl: finalPrice,
         currency,
+        calculation_date: new Date(), // Hesaplama tarihini ekle
       });
 
       const price = await Price.create({
@@ -80,9 +81,23 @@ exports.calculatePrice = async (req, res) => {
         vat: numericValues.vat,
         final_price_tl: parseFloat(finalPrice.toFixed(2)),
         currency,
+        calculation_date: new Date(), // Hesaplama tarihini ekle
       });
 
       console.log("Kaydedilen fiyat:", price.toJSON());
+
+      // Fiyat geçmişini güncelle
+      const updatedHistory = await Price.findAll({
+        where: { customer_id: parseInt(customer_id) },
+        include: [
+          {
+            model: Customer,
+            attributes: ["name", "country"],
+            as: "Customer",
+          },
+        ],
+        order: [["calculation_date", "DESC"]],
+      });
 
       res.status(201).json({
         success: true,
@@ -95,6 +110,7 @@ exports.calculatePrice = async (req, res) => {
           vatAmount,
           finalPrice,
         },
+        history: updatedHistory, // Güncellenmiş fiyat geçmişini de gönder
       });
     } catch (dbError) {
       console.error("Veritabanı kayıt hatası:", dbError);
