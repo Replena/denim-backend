@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "db:check": "node src/config/checkDb.js"
+    "db:check": "node src/config/checkDb.js",
+    "test-db": "node src/scripts/testDb.js"
   },
   "engines": {
     "node": "18.x"
