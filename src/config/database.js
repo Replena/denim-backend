@@ -1,14 +1,8 @@
 const { Sequelize } = require("sequelize");
 require("dotenv").config();
 
-// Railway PostgreSQL bağlantı bilgileri
-const sequelize = new Sequelize({
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: "postgres",
-  host: "dpg-cu9mpntsvqrc73dhnbng-a",
-  port: 5432,
-  database: "denim",
-  username: "denim_user",
-  password: "EOLmGnnWzp9kUNg0rssOOEY0U11xEAvb",
   dialectOptions: {
     ssl: {
       require: true,
