@@ -2,6 +2,7 @@ const { Sequelize } = require("sequelize");
 require("dotenv").config();
 
 const DATABASE_URL =
+  process.env.DATABASE_URL ||
   "postgresql://postgres:ewfnVUuASohkxfVDuTcqcsYGXiMMBNDz@autorack.proxy.rlwy.net:45517/railway";
 
 const sequelize = new Sequelize(DATABASE_URL, {

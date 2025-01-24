@@ -10,7 +10,11 @@ const app = express();
 // CORS ayarları
 app.use(
   cors({
-    origin: ["https://your-vercel-url.vercel.app", "http://localhost:5173"],
+    origin: [
+      "https://denim-frontend.vercel.app",
+      "https://denim-frontend-1fpnqphb5-replenas-projects.vercel.app",
+      "http://localhost:5173",
+    ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type"],
