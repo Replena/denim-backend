@@ -44,19 +44,49 @@ const PORT = process.env.PORT || 8081;
 db.authenticate()
   .then(() => {
     console.log("Veritabanı bağlantısı başarılı");
-    app.listen(PORT, () => {
+
+    // HTTP sunucusunu başlat
+    const server = app.listen(PORT, () => {
       console.log(`Sunucu ${PORT} portunda çalışıyor`);
+    });
+
+    // Graceful shutdown
+    process.on("SIGTERM", () => {
+      console.log("SIGTERM sinyali alındı. Sunucu kapatılıyor...");
+      server.close(() => {
+        console.log("Sunucu kapatıldı");
+        process.exit(0);
+      });
+    });
+
+    // Beklenmeyen hatalar için
+    process.on("uncaughtException", (error) => {
+      console.error("Beklenmeyen hata:", error);
+      server.close(() => {
+        console.log("Sunucu hata nedeniyle kapatıldı");
+        process.exit(1);
+      });
     });
   })
   .catch((err) => {
     console.error("Veritabanı bağlantı hatası:", err);
+    process.exit(1);
   });
 
-// Hata yakalama
+// Global hata yakalama
 app.use((err, req, res, next) => {
   console.error("Sunucu hatası:", err);
   res.status(500).json({
+    success: false,
     message: "Sunucuda bir hata oluştu",
     error: err.message,
+  });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Sayfa bulunamadı",
   });
 });

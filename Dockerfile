@@ -10,4 +10,7 @@ COPY . .
 
 EXPOSE 8081
 
-CMD ["npm", "start"] 
+RUN echo "#!/bin/sh\nnode src/config/dbInit.js && node src/index.js" > start.sh
+RUN chmod +x start.sh
+
+CMD ["./start.sh"] 
