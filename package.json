@@ -10,11 +10,11 @@
     "db:init": "node src/config/dbInit.js",
     "test-db": "node src/scripts/testDb.js",
     "migrate": "node src/scripts/migrateData.js",
-    "postinstall": "npm run db:init"
+    "postinstall": "node src/config/dbInit.js"
   },
   "engines": {
-    "node": "18.x",
-    "npm": "9.x"
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   },
   "dependencies": {
     "cors": "^2.8.5",
