@@ -48,40 +48,74 @@ const PORT = process.env.PORT || 8081;
 
 // Veritabanı bağlantısı ve sunucuyu başlat
 console.log("Uygulama başlatılıyor...");
+console.log("NODE_ENV:", process.env.NODE_ENV);
+console.log("PORT:", process.env.PORT);
+console.log("DATABASE_URL mevcut:", !!process.env.DATABASE_URL);
+
+let server;
 
 db.authenticate()
-  .then(() => {
+  .then(async () => {
     console.log("Veritabanı bağlantısı başarılı");
 
-    // HTTP sunucusunu başlat
-    const server = app.listen(PORT, "0.0.0.0", () => {
-      console.log(`Sunucu ${PORT} portunda çalışıyor`);
-      console.log("Environment:", process.env.NODE_ENV);
-      console.log("CORS origins:", app.get("cors").origin);
-    });
-
-    // Graceful shutdown
-    process.on("SIGTERM", () => {
-      console.log("SIGTERM sinyali alındı. Sunucu kapatılıyor...");
-      server.close(() => {
-        console.log("Sunucu kapatıldı");
-        process.exit(0);
+    try {
+      // HTTP sunucusunu başlat
+      server = app.listen(PORT, "0.0.0.0", () => {
+        console.log(`Sunucu ${PORT} portunda çalışıyor`);
+        console.log("Environment:", process.env.NODE_ENV);
+        console.log(
+          "CORS origins:",
+          app.get("cors")?.origin || "Not configured"
+        );
       });
-    });
 
-    // Beklenmeyen hatalar için
-    process.on("uncaughtException", (error) => {
-      console.error("Beklenmeyen hata:", error);
-      server.close(() => {
-        console.log("Sunucu hata nedeniyle kapatıldı");
-        process.exit(1);
+      // Sağlık kontrolü endpoint'i
+      app.get("/health", (req, res) => {
+        res.json({
+          status: "up",
+          timestamp: new Date().toISOString(),
+          database: "connected",
+        });
       });
-    });
+    } catch (error) {
+      console.error("Sunucu başlatma hatası:", error);
+      process.exit(1);
+    }
   })
   .catch((err) => {
     console.error("Veritabanı bağlantı hatası:", err);
     process.exit(1);
   });
+
+// Graceful shutdown
+process.on("SIGTERM", () => {
+  console.log("SIGTERM sinyali alındı. Sunucu kapatılıyor...");
+  if (server) {
+    server.close(() => {
+      console.log("Sunucu kapatıldı");
+      process.exit(0);
+    });
+  } else {
+    process.exit(0);
+  }
+});
+
+// Beklenmeyen hatalar için
+process.on("uncaughtException", (error) => {
+  console.error("Beklenmeyen hata:", error);
+  if (server) {
+    server.close(() => {
+      console.log("Sunucu hata nedeniyle kapatıldı");
+      process.exit(1);
+    });
+  } else {
+    process.exit(1);
+  }
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("İşlenmeyen Promise reddi:", reason);
+});
 
 // Global hata yakalama
 app.use((err, req, res, next) => {
