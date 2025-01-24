@@ -1,11 +1,16 @@
 const { Pool } = require("pg");
+require("dotenv").config();
 
 const pool = new Pool({
-  user: "postgres",
-  host: "localhost",
-  database: "postgres",
-  password: "postgres",
-  port: 5432,
+  user: process.env.POSTGRES_USER,
+  password: process.env.POSTGRES_PASSWORD,
+  host: process.env.PGHOST,
+  port: process.env.PGPORT,
+  database: process.env.POSTGRES_DB,
+  ssl: {
+    require: true,
+    rejectUnauthorized: false,
+  },
 });
 
 async function checkDatabase() {
