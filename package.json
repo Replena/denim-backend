@@ -7,7 +7,9 @@
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
     "db:check": "node src/config/checkDb.js",
-    "test-db": "node src/scripts/testDb.js"
+    "db:init": "node src/config/dbInit.js",
+    "test-db": "node src/scripts/testDb.js",
+    "migrate": "node src/scripts/migrateData.js"
   },
   "engines": {
     "node": "18.x"

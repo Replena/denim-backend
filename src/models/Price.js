@@ -1,9 +1,8 @@
-const { DataTypes, Model } = require("sequelize");
+const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 
-class Price extends Model {}
-
-Price.init(
+const Price = sequelize.define(
+  "Price",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -14,26 +13,56 @@ Price.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    fabric_price: DataTypes.DECIMAL(10, 2),
-    lining_price: DataTypes.DECIMAL(10, 2),
-    garni_price: DataTypes.DECIMAL(10, 2),
-    labor_cost: DataTypes.DECIMAL(10, 2),
-    overhead: DataTypes.DECIMAL(10, 2),
-    commission: DataTypes.DECIMAL(5, 2),
-    profit_margin: DataTypes.DECIMAL(5, 2),
-    vat: DataTypes.DECIMAL(5, 2),
-    final_price_tl: DataTypes.DECIMAL(12, 2),
-    currency: DataTypes.STRING(3),
+    fabric_price: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
+    lining_price: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
+    garni_price: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
+    labor_cost: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
+    overhead: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
+    commission: {
+      type: DataTypes.DECIMAL(5, 2),
+      allowNull: false,
+    },
+    profit_margin: {
+      type: DataTypes.DECIMAL(5, 2),
+      allowNull: false,
+    },
+    vat: {
+      type: DataTypes.DECIMAL(5, 2),
+      allowNull: false,
+    },
+    final_price_tl: {
+      type: DataTypes.DECIMAL(12, 2),
+      allowNull: false,
+    },
+    currency: {
+      type: DataTypes.STRING(3),
+      allowNull: false,
+    },
     calculation_date: {
       type: DataTypes.DATE,
-      defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
+      defaultValue: DataTypes.NOW,
     },
   },
   {
-    sequelize,
-    modelName: "Price",
     tableName: "prices",
-    timestamps: false,
+    timestamps: true,
+    createdAt: "created_at",
+    updatedAt: "updated_at",
   }
 );
 

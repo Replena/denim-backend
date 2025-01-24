@@ -1,9 +1,8 @@
-const { DataTypes, Model } = require("sequelize");
+const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 
-class Customer extends Model {}
-
-Customer.init(
+const Customer = sequelize.define(
+  "Customer",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -20,10 +19,10 @@ Customer.init(
     },
   },
   {
-    sequelize,
-    modelName: "Customer",
     tableName: "customers",
-    timestamps: false,
+    timestamps: true,
+    createdAt: "created_at",
+    updatedAt: "updated_at",
   }
 );
 
