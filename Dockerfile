@@ -8,8 +8,6 @@ RUN npm install --legacy-peer-deps
 
 COPY . .
 
-RUN npm run db:init
-
 EXPOSE 8081
 
-CMD ["npm", "start"] 
+CMD npm run db:init && npm start 

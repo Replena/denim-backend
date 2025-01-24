@@ -9,8 +9,7 @@
     "db:check": "node src/config/checkDb.js",
     "db:init": "node src/config/dbInit.js",
     "test-db": "node src/scripts/testDb.js",
-    "migrate": "node src/scripts/migrateData.js",
-    "postinstall": "node src/config/dbInit.js"
+    "migrate": "node src/scripts/migrateData.js"
   },
   "engines": {
     "node": ">=18.0.0",
