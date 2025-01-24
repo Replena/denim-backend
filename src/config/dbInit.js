@@ -8,9 +8,10 @@ async function initializeDatabase() {
     Customer.hasMany(Price, { foreignKey: "customer_id" });
     Price.belongsTo(Customer, { foreignKey: "customer_id" });
 
-    // Tabloları oluştur
-    await sequelize.sync({ force: true }); // DİKKAT: force: true tüm tabloları silip yeniden oluşturur
-    console.log("Veritabanı tabloları başarıyla oluşturuldu");
+    // Tabloları senkronize et (DİKKAT: force: true tüm verileri siler!)
+    await sequelize.sync({ alter: true });
+
+    console.log("Veritabanı tabloları güncellendi");
 
     // Örnek müşteri verileri
     const customers = await Customer.bulkCreate([
@@ -76,9 +77,6 @@ async function initializeDatabase() {
     console.log("Fiyat verileri eklendi");
   } catch (error) {
     console.error("Veritabanı başlatma hatası:", error);
-  } finally {
-    // Bağlantıyı kapat
-    await sequelize.close();
   }
 }
 

@@ -18,63 +18,39 @@ const calculatePriceDetails = (baseCost, overhead, commission, profit, vat) => {
 
 exports.calculatePrice = async (req, res) => {
   try {
-    console.log("Gelen istek verisi:", req.body); // Debug için
-
     const {
       customer_id,
       fabric_price,
       lining_price,
       garni_price,
-      labor_cost = 0,
+      labor_cost,
       overhead,
       commission,
-      profit_margin = 20,
-      vat = 18,
-      currency = "TRY",
-      exchangeRates,
+      profit_margin,
+      vat,
+      currency,
     } = req.body;
 
-    // Gelen değerlerin kontrolü
-    if (!customer_id) {
-      return res.status(400).json({
-        success: false,
-        message: "Müşteri ID gerekli",
-      });
-    }
-
-    if (!fabric_price || !overhead || !commission) {
-      return res.status(400).json({
-        success: false,
-        message: "Gerekli fiyat bilgileri eksik",
-        required: {
-          fabric_price: !!fabric_price,
-          overhead: !!overhead,
-          commission: !!commission,
-        },
-      });
-    }
-
-    // Sayısal değerlere çevirme
+    // Sayısal değerleri doğrula ve dönüştür
     const numericValues = {
-      fabric_price: Number(fabric_price),
-      lining_price: Number(lining_price || 0),
-      garni_price: Number(garni_price || 0),
-      labor_cost: Number(labor_cost || 0),
-      overhead: Number(overhead),
-      commission: Number(commission),
-      profit_margin: Number(profit_margin),
-      vat: Number(vat),
+      fabric_price: parseFloat(fabric_price),
+      lining_price: parseFloat(lining_price),
+      garni_price: parseFloat(garni_price),
+      labor_cost: parseFloat(labor_cost),
+      overhead: parseFloat(overhead),
+      commission: parseFloat(commission),
+      profit_margin: parseFloat(profit_margin),
+      vat: parseFloat(vat),
     };
 
-    // Temel maliyet hesaplama
-    const baseCost = [
-      numericValues.fabric_price,
-      numericValues.lining_price,
-      numericValues.garni_price,
-      numericValues.labor_cost,
-    ].reduce((sum, price) => sum + price, 0);
+    // Temel maliyeti hesapla
+    const baseCost =
+      numericValues.fabric_price +
+      numericValues.lining_price +
+      numericValues.garni_price +
+      numericValues.labor_cost;
 
-    console.log("Temel maliyet:", baseCost); // Debug için
+    console.log("Temel maliyet:", baseCost);
 
     // Fiyat detaylarını hesapla
     const withOverhead = baseCost * (1 + numericValues.overhead / 100);
@@ -84,14 +60,29 @@ exports.calculatePrice = async (req, res) => {
     const finalPrice = withProfit + vatAmount;
 
     try {
-      const price = await Price.create({
+      // Veritabanına kaydetmeden önce verileri kontrol et
+      console.log("Kaydedilecek veriler:", {
         customer_id,
         ...numericValues,
         final_price_tl: finalPrice,
         currency,
       });
 
-      console.log("Kaydedilen fiyat:", price.toJSON()); // Debug için
+      const price = await Price.create({
+        customer_id: parseInt(customer_id),
+        fabric_price: numericValues.fabric_price,
+        lining_price: numericValues.lining_price,
+        garni_price: numericValues.garni_price,
+        labor_cost: numericValues.labor_cost,
+        overhead: numericValues.overhead,
+        commission: numericValues.commission,
+        profit_margin: numericValues.profit_margin,
+        vat: numericValues.vat,
+        final_price_tl: parseFloat(finalPrice.toFixed(2)),
+        currency,
+      });
+
+      console.log("Kaydedilen fiyat:", price.toJSON());
 
       res.status(201).json({
         success: true,
