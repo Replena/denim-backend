@@ -24,17 +24,22 @@ apiClient.interceptors.request.use(
 
 // Yanıt interceptor'ı
 apiClient.interceptors.response.use(
-  (response) => {
-    console.log("Alınan yanıt:", response); // Debug için
-    return response;
-  },
+  (response) => response,
   (error) => {
-    console.error(
-      "API Hatası:",
-      error.response?.status,
-      "-",
-      error.response?.data?.message
-    );
+    if (error.response) {
+      // Sunucu yanıt verdi ama hata kodu döndü
+      console.error(
+        "Sunucu hatası:",
+        error.response.status,
+        error.response.data
+      );
+    } else if (error.request) {
+      // İstek yapıldı ama yanıt alınamadı
+      console.error("Ağ hatası:", error.message);
+    } else {
+      // İstek oluşturulurken hata oluştu
+      console.error("İstek hatası:", error.message);
+    }
     return Promise.reject(error);
   }
 );

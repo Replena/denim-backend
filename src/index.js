@@ -13,18 +13,18 @@ app.use(
     origin: [
       "https://denim-frontend.vercel.app",
       "https://denim-frontend-git-main-replenas-projects.vercel.app",
-      "https://denim-frontend-33lo11gc9-replenas-projects.vercel.app",
-      "https://denim-frontend-lhuivrq5t-replenas-projects.vercel.app",
-      "https://denim-frontend-*.vercel.app",
-      "https://denim-frontend-*-replenas-projects.vercel.app",
+      "https://denim-frontend-1w1aptyrw-replenas-projects.vercel.app",
+      "https://denim-frontend-*-replenas-projects.vercel.app", // Wildcard pattern
       "http://localhost:5173",
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "Origin", "Accept"],
-    exposedHeaders: ["Content-Length", "X-Requested-With"],
   })
 );
+
+// Pre-flight istekleri için
+app.options("*", cors());
 
 // JSON parse
 app.use(express.json());
