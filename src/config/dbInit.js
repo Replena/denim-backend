@@ -8,12 +8,12 @@ async function initializeDatabase() {
     Customer.hasMany(Price, { foreignKey: "customer_id" });
     Price.belongsTo(Customer, { foreignKey: "customer_id" });
 
-    // Tabloları senkronize et (DİKKAT: force: true tüm verileri siler!)
-    await sequelize.sync({ alter: true });
+    // Tabloları senkronize et (force: true ile tabloları sil ve yeniden oluştur)
+    await sequelize.sync({ force: true });
 
-    console.log("Veritabanı tabloları güncellendi");
+    console.log("Veritabanı tabloları yeniden oluşturuldu");
 
-    // Örnek müşteri verileri
+    // Örnek müşteri verileri (aynı isimler)
     const customers = await Customer.bulkCreate([
       { name: "CASABLANCA PARIS", country: "France" },
       { name: "CINQ A CEPT", country: "United States" },
@@ -31,7 +31,16 @@ async function initializeDatabase() {
 
     console.log("Müşteri verileri eklendi");
 
-    // Örnek fiyat verileri
+    // Geçmiş tarihli örnek fiyat verileri
+    const pastDates = [
+      new Date("2024-01-15"),
+      new Date("2024-01-10"),
+      new Date("2024-01-05"),
+      new Date("2023-12-28"),
+      new Date("2023-12-20"),
+      new Date("2023-12-15"),
+    ];
+
     await Price.bulkCreate([
       {
         customer_id: 1,
@@ -45,6 +54,7 @@ async function initializeDatabase() {
         vat: 18.0,
         final_price_tl: 450.0,
         currency: "EUR",
+        calculation_date: pastDates[0],
       },
       {
         customer_id: 2,
@@ -58,6 +68,7 @@ async function initializeDatabase() {
         vat: 18.0,
         final_price_tl: 520.0,
         currency: "USD",
+        calculation_date: pastDates[1],
       },
       {
         customer_id: 3,
@@ -71,10 +82,53 @@ async function initializeDatabase() {
         vat: 18.0,
         final_price_tl: 410.0,
         currency: "EUR",
+        calculation_date: pastDates[2],
+      },
+      {
+        customer_id: 1,
+        fabric_price: 95.0,
+        lining_price: 48.0,
+        garni_price: 24.0,
+        labor_cost: 72.0,
+        overhead: 34.0,
+        commission: 8.0,
+        profit_margin: 20.0,
+        vat: 18.0,
+        final_price_tl: 430.0,
+        currency: "EUR",
+        calculation_date: pastDates[3],
+      },
+      {
+        customer_id: 2,
+        fabric_price: 115.0,
+        lining_price: 58.0,
+        garni_price: 29.0,
+        labor_cost: 78.0,
+        overhead: 38.0,
+        commission: 8.0,
+        profit_margin: 20.0,
+        vat: 18.0,
+        final_price_tl: 500.0,
+        currency: "USD",
+        calculation_date: pastDates[4],
+      },
+      {
+        customer_id: 3,
+        fabric_price: 85.0,
+        lining_price: 43.0,
+        garni_price: 21.0,
+        labor_cost: 68.0,
+        overhead: 31.0,
+        commission: 8.0,
+        profit_margin: 20.0,
+        vat: 18.0,
+        final_price_tl: 390.0,
+        currency: "EUR",
+        calculation_date: pastDates[5],
       },
     ]);
 
-    console.log("Fiyat verileri eklendi");
+    console.log("Geçmiş tarihli fiyat verileri eklendi");
   } catch (error) {
     console.error("Veritabanı başlatma hatası:", error);
   }
